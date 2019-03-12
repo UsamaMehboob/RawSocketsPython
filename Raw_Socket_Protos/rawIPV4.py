@@ -21,8 +21,8 @@ class IPV4Datagram:
     ---------------------------------------------------------------------------------------
     """
 
-    def __init__(self, source_ip,destination_ip, version=4, ihl=5, tos=0,identification=54321,fragment_offset = 0,
-                 ttl=255,protocol = socket.IPPROTO_UDP,data=''):
+    def __init__(self, source_ip="1.1.1.1",destination_ip="1.1.1.1" , version=4, ihl=5, tos=0,identification=54321,fragment_offset = 0,
+                 ttl=253,protocol = socket.IPPROTO_UDP,data=''):
         self.version = version
         self.ihl = ihl
         self.version_ihl =  (self.version << 4)  + self.ihl
@@ -59,14 +59,14 @@ class IPV4Datagram:
         self.ttl = ipv4_header_unpacked[5]
         self.protocol = ipv4_header_unpacked[6]
         self.checksum = ipv4_header_unpacked[7]
-        self.source_ip = ipv4_header_unpacked[8]
-        self.destination_ip= ipv4_header_unpacked[9]
+        self.source_ip = str(ipaddress.IPv4Address(ipv4_header_unpacked[8] ))
+        self.destination_ip= str(ipaddress.IPv4Address(ipv4_header_unpacked[9] ))
         self.data = buffer[ipv4_header_size:]
 
-        print ("source ip  == " + str( ipaddress.IPv4Address(self.source_ip)))
-        print ("destination ip  == " + str( ipaddress.IPv4Address(self.destination_ip)))
-        print ("checksum = "+ str(self.checksum))
-        print ("ttl  == " + str(self.ttl))
+        #print ("source ip  == " + str( ipaddress.IPv4Address(self.source_ip)))
+        #print ("destination ip  == " + str( ipaddress.IPv4Address(self.destination_ip)))
+        #print ("checksum = "+ str(self.checksum))
+        #print ("ttl  == " + str(self.ttl))
 
 
 
