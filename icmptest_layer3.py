@@ -17,16 +17,18 @@ while True:
     sequencenumber = sequencenumber + 1
     icmpheaderdatagram = rawICMP.ICMPDatagram (type = ICMP_ECHO_REQ, sequence=sequencenumber)
     icmpheader = icmpheaderdatagram.pack()
+    start = time.time()
     socketsender.sendto(icmpheader,(remoteHostIP,0) )
-    time.sleep(1)
     bytess, address = socketsender.recvfrom(1024)
+    diff = int((time.time() - start ) * 1000 )
     ipv4_header = rawIPV4.IPV4Datagram()
     ipv4_header.unpack(bytess)
     icmp_header = rawICMP.ICMPDatagram()
     icmp_header.unpack(ipv4_header.data)
     if ( ipv4_header.source_ip == remoteHostIP ):
         print ( '{} bytes from {}: icmp_seq={} ttl={} time={}ms'.format(len(bytess),ipv4_header.source_ip,
-                                                                     icmp_header.sequence, ipv4_header.ttl, 0))
+                                                                     icmp_header.sequence, ipv4_header.ttl, diff))
+    time.sleep(1)
 
 
 
