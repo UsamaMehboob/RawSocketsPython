@@ -1,6 +1,8 @@
 import struct
 import socket
 import ipaddress
+from .utils import calculate_checksum
+
 IPV4_HEAD_FMT="!BBHHHBBHII" #H is unsigned short (2 bytes) ! is for network (big-endian)
 
 class IPV4Datagram:
@@ -22,7 +24,7 @@ class IPV4Datagram:
     """
 
     def __init__(self, source_ip="1.1.1.1",destination_ip="1.1.1.1" , version=4, ihl=5, tos=0,identification=54321,fragment_offset = 0,
-                 ttl=253,protocol = socket.IPPROTO_UDP,data=''):
+                 ttl=253,protocol = socket.IPPROTO_UDP,data='', checksum=0):
         self.version = version
         self.ihl = ihl
         self.version_ihl =  (self.version << 4)  + self.ihl
@@ -31,7 +33,7 @@ class IPV4Datagram:
         self.fragment_offset = fragment_offset
         self.ttl = ttl
         self.protocol = protocol
-        self.checksum =0
+        self.checksum = checksum
         self.source_ip =int(ipaddress.IPv4Address( source_ip )) # convert into integer
         self.destination_ip = int(ipaddress.IPv4Address(destination_ip ))
         self.data = data
@@ -43,7 +45,12 @@ class IPV4Datagram:
     def pack(self):
         ipv4_header = struct.pack(IPV4_HEAD_FMT, self.version_ihl,self.tos,self.length, self.identification,
         self.fragment_offset, self.ttl, self.protocol, self.checksum, self.source_ip, self.destination_ip)
+        self.checksum = calculate_checksum(ipv4_header)
+        ipv4_header = struct.pack(IPV4_HEAD_FMT, self.version_ihl,self.tos,self.length, self.identification,
+                                  self.fragment_offset, self.ttl, self.protocol, self.checksum, self.source_ip, self.destination_ip)
+
         return ipv4_header
+
 
     def unpack(self, buffer):
         ipv4_header_size = struct.calcsize(IPV4_HEAD_FMT)
